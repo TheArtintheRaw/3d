@@ -73,7 +73,7 @@ canvas {
 }
 
 .decalcontrol-container {
-  @apply absolute left-full ml-3 glassmorphism p-3 w-[230px] h-[170px] rounded-md flex flex-col gap-4;
+  @apply absolute left-full -ml-20 glassmorphism -mt-44 p-3 w-[230px] h-[170px] rounded-md flex flex-col gap-4;
 }
 
 .aipicker-textarea {

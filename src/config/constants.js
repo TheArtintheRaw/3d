@@ -17,10 +17,6 @@ export const EditorTabs = [
 		name: 'sizepicker',
 		icon: download,
 	},
-	{
-		name: 'decalcontrol',
-		icon: logoShirt,
-	},
 ];
 
 export const FilterTabs = [

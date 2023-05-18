@@ -1,0 +1,35 @@
+{
+  "name": "t-shirt-configurator",
+  "version": "1.0.0",
+  "description": "",
+  "keywords": [
+    "decals"
+  ],
+  "main": "src/index.js",
+  "dependencies": {
+    "@react-three/drei": "9.68.3",
+    "@react-three/fiber": "8.13.0",
+    "@types/three": "0.152.0",
+    "framer-motion": "10.12.11",
+    "maath": "0.5.3",
+    "react": "18.2.0",
+    "react-color": "^2.19.3",
+    "react-dom": "18.2.0",
+    "react-icons": "^4.7.1",
+    "react-scripts": "5.0.1",
+    "three": "0.152.2",
+    "valtio": "1.10.5"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  },
+  "browserslist": [
+    ">1%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
+}

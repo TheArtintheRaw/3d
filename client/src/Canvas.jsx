@@ -1,7 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable no-alert */
-/* eslint-disable react/prop-types */
-/* eslint-disable react/no-unknown-property */
 import React, { useRef, useState, useLayoutEffect } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { useGLTF, useTexture, AccumulativeShadows, RandomizedLight, Decal, Environment, Center, Html } from '@react-three/drei'
@@ -91,7 +87,7 @@ function Shirt() {
   const snap = useSnapshot(state)
 
   const decalTexture = useTexture(snap.logoDecal)
-  const { nodes, materials } = useGLTF('/shirt_baked.glb')
+  const { nodes, materials } = useGLTF('/dpeshrt.glb')
   const [decalPosition, setDecalPosition] = useState(snap.logoPosition)
   const [decalScale, setDecalScale] = useState(snap.logoScale)
 

@@ -4,8 +4,8 @@ import { useSnapshot } from 'valtio'
 
 import config from './config/config'
 import state from './store'
-
-import { reader } from './config/helpers'
+import { download } from './assets'
+import { downloadCanvasToImage, reader } from './config/helpers'
 import { EditorTabs, FilterTabs, DecalTypes } from './config/constants'
 import { fadeAnimation, slideAnimation } from './config/motion'
 import { AIPicker, ColorPicker, CustomButton, FilePicker, SizePicker, Tab } from './components'
@@ -14,7 +14,7 @@ const Customizer = () => {
   const snap = useSnapshot(state)
 
   const [file, setFile] = useState('')
-
+  const [size, setSize] = useState('')
   const [prompt, setPrompt] = useState('')
   const [generatingImg, setGeneratingImg] = useState(false)
 
@@ -22,10 +22,6 @@ const Customizer = () => {
   const [activeFilterTab, setActiveFilterTab] = useState({
     logoShirt: true
   })
-
-  const handleChange = (e) => {
-    setSelectedSize(e.state.size)
-  }
 
   // show tab content depending on the activeTab
   const generateTabContent = () => {
@@ -41,6 +37,10 @@ const Customizer = () => {
       default:
         return null
     }
+  }
+
+  const handleChange = (e) => {
+    setSize(e.state.size)
   }
 
   const handleSubmit = async (type) => {
@@ -141,5 +141,6 @@ const Customizer = () => {
     </AnimatePresence>
   )
 }
+
 
 export default Customizer

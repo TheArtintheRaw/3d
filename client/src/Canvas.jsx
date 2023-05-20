@@ -117,7 +117,7 @@ function Shirt() {
   const shirtWidth = shirtBoundingBox.max.x - shirtBoundingBox.min.x
   const shirtHeight = shirtBoundingBox.max.y - shirtBoundingBox.min.y
 
-  const padding = 0.05 // Padding around the edges of the shirt
+  const padding = 0.1 // Padding around the edges of the shirt
   const maxDecalWidth = shirtWidth - padding
   const maxDecalHeight = shirtHeight - padding
 

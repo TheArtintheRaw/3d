@@ -196,7 +196,7 @@ function Shirt() {
       )}
       <mesh castShadow geometry={nodes.T_Shirt_male.geometry} material={materials.lambert1} material-roughness={1} dispose={null}>
         {snap.isLogoTexture && (
-          <Decal debug position={decalPosition} scale={decalScale} rotation={[0, 0, 0]} opacity={1} map={decalTexture} depthTest={false} depthWrite={false} />
+          <Decal position={decalPosition} scale={decalScale} rotation={[0, 0, 0]} opacity={1} map={decalTexture} depthTest={false} depthWrite={false} />
         )}
       </mesh>
     </group>

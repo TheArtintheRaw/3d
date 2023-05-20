@@ -15,7 +15,7 @@ export const EditorTabs = [
 	},
 	{
 		name: 'sizepicker',
-		icon: download,
+		icon: logoShirt,
 	},
 ];
 

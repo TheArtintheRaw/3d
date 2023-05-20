@@ -1,6 +1,5 @@
 import React from 'react'
 import { useSnapshot } from 'valtio'
-import Proptypes from 'prop-types'
 
 import state from '../store'
 

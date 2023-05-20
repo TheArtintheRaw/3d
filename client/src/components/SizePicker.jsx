@@ -3,21 +3,15 @@ import { useSnapshot } from 'valtio'
 
 import state from '../store'
 
-const SizePicker = (size) => {
+const SizePicker = ({ size, setSize }) => {
   const snap = useSnapshot(state)
-  const [selectedSize, setSelectedSize] = useState(snap.size)
-
   size = size || snap.size
-
-  const handleChange = (e) => {
-    setSelectedSize(e.state.size)
-  }
 
   return (
     <div className="absolute left-full ml-3">
       <select className="sizepicker-container">
         {snap.sizes.map((size) => (
-          <option key={size} onChange={handleChange} onClick={() => (state.size = size)}>
+          <option key={size} onChange={(e) => setSize(e.target.size)} onClick={() => (state.size = size)}>
             {size}
           </option>
         ))}

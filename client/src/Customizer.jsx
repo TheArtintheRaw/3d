@@ -1,51 +1,55 @@
-/* eslint-disable no-alert */
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useSnapshot } from 'valtio'
 
+import config from './config/config'
+import state from './store'
+
+import { reader } from './config/helpers'
 import { EditorTabs, FilterTabs, DecalTypes } from './config/constants'
 import { fadeAnimation, slideAnimation } from './config/motion'
-import { AIPicker, SizePicker, ColorPicker, CustomButton, FilePicker, Tab } from './components'
-import state from './store'
-import { reader } from './config/helpers'
+import { AIPicker, ColorPicker, CustomButton, FilePicker, SizePicker, Tab } from './components'
 
 const Customizer = () => {
   const snap = useSnapshot(state)
-  const [color, setColor] = useState('#111111')
+
   const [file, setFile] = useState('')
+
   const [prompt, setPrompt] = useState('')
   const [generatingImg, setGeneratingImg] = useState(false)
-  const [size, setSize] = useState('')
+
   const [activeEditorTab, setActiveEditorTab] = useState('')
   const [activeFilterTab, setActiveFilterTab] = useState({
     logoShirt: true
   })
 
-  // Show tab content depending on the activeTab
+  const handleChange = (e) => {
+    setSelectedSize(e.state.size)
+  }
+
+  // show tab content depending on the activeTab
   const generateTabContent = () => {
     switch (activeEditorTab) {
-      case 'sizepicker':
-        return <SizePicker setSize={setSize} size={size} sizes={size} />
       case 'colorpicker':
-        return <ColorPicker color={color} />
+        return <ColorPicker />
       case 'filepicker':
         return <FilePicker file={file} setFile={setFile} readFile={readFile} />
       case 'aipicker':
         return <AIPicker prompt={prompt} setPrompt={setPrompt} generatingImg={generatingImg} handleSubmit={handleSubmit} />
+      case 'sizepicker':
+        return <SizePicker size={size} setSize={setSize} handleChange={handleChange} />
       default:
         return null
     }
   }
 
   const handleSubmit = async (type) => {
-    if (!prompt) {
-      return alert('Please enter a prompt')
-    }
+    if (!prompt) return alert('Please enter a prompt')
 
     try {
       setGeneratingImg(true)
 
-      const response = await fetch('https://aishirt-u1up.onrender.com:8000/api/v1/dalle', {
+      const response = await fetch('http://localhost:8080/api/v1/dalle', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -86,15 +90,18 @@ const Customizer = () => {
         break
       default:
         state.isLogoTexture = true
+        state.isFullTexture = false
         break
     }
 
-    // After setting the state, activeFilterTab is updated
+    // after setting the state, activeFilterTab is updated
 
-    setActiveFilterTab((prevState) => ({
-      ...prevState,
-      [tabName]: !prevState[tabName]
-    }))
+    setActiveFilterTab((prevState) => {
+      return {
+        ...prevState,
+        [tabName]: !prevState[tabName]
+      }
+    })
   }
 
   const readFile = (type) => {
@@ -102,14 +109,6 @@ const Customizer = () => {
       handleDecals(type, result)
       setActiveEditorTab('')
     })
-  }
-
-  const handleActiveEditorTab = (tabName) => {
-    if (activeEditorTab === tabName) {
-      setActiveEditorTab('')
-    } else {
-      setActiveEditorTab(tabName)
-    }
   }
 
   return (
@@ -120,7 +119,7 @@ const Customizer = () => {
             <div className="flex items-center min-h-screen">
               <div className="editortabs-container tabs">
                 {EditorTabs.map((tab) => (
-                  <Tab key={tab.name} tab={tab} handleClick={() => handleActiveEditorTab(tab.name)} onMouseEnter />
+                  <Tab key={tab.name} tab={tab} handleClick={() => setActiveEditorTab(tab.name)} />
                 ))}
 
                 {generateTabContent()}
@@ -132,16 +131,7 @@ const Customizer = () => {
             <CustomButton type="filled" title="Go Back" handleClick={() => (state.intro = true)} customStyles="w-fit px-4 py-2.5 font-bold text-sm" />
           </motion.div>
 
-          {/* <motion.div className='absolute z-10 bottom-5 right-5' {...fadeAnimation}>
-						<CustomButton
-							type='filled'
-							title='Order Now'
-							handleClick={() => handleBuyNow()}
-							customStyles='w-fit px-4 py-2.5 font-bold text-sm'
-						/>
-					</motion.div> */}
-
-          <motion.div className="filtertabs-container w-1/2 ml-[25%]" {...slideAnimation('up')}>
+          <motion.div className="filtertabs-container" {...slideAnimation('up')}>
             {FilterTabs.map((tab) => (
               <Tab key={tab.name} tab={tab} isFilterTab isActiveTab={activeFilterTab[tab.name]} handleClick={() => handleActiveFilterTab(tab.name)} />
             ))}

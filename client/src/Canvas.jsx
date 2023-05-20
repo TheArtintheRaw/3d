@@ -12,28 +12,33 @@ import { LogoControls } from './canvas/LogoControls'
 import ImageBorder from './canvas/ImageBorder'
 import * as THREE from 'three'
 
-export const App = () => (
-  <Canvas
-    shadows
-    camera={{ position: [0, 0, 0], fov: 25 }}
-    gl={{ preserveDrawingBuffer: true }}
-    eventSource={document.getElementById('root')}
-    eventPrefix="client">
-    <ambientLight intensity={0.5} />
-    <Environment preset="city" />
-    <CameraRig>
-      <Backdrop />
-      <ImageBorder />
-      <Center>
-        <Shirt />
-      </Center>
-    </CameraRig>
-  </Canvas>
-)
+export const App = () => {
+  return (
+    <Canvas
+      shadows
+      camera={{ position: [0, 0, 0], fov: 25 }}
+      gl={{ preserveDrawingBuffer: true }}
+      eventSource={document.getElementById('root')}
+      eventPrefix="client">
+      <ambientLight intensity={0.5} />
+      <Environment preset="city" />
 
-function Backdrop() {
+      <CameraRig>
+        <Backdrop />
+        <ImageBorder />
+        <Center>
+          <Shirt />
+        </Center>
+      </CameraRig>
+    </Canvas>
+  )
+}
+
+const Backdrop = () => {
   const shadows = useRef()
+
   useFrame((state, delta) => easing.dampC(shadows.current.getMesh().material.color, state.color, 0.25, delta))
+
   return (
     <AccumulativeShadows ref={shadows} temporal frames={60} alphaTest={0.85} scale={10} rotation={[Math.PI / 2, 0, 0]} position={[0, 0, -0.14]}>
       <RandomizedLight amount={4} radius={9} intensity={0.55} ambient={0.25} position={[5, 5, -10]} />
@@ -84,12 +89,11 @@ function CameraRig({ children }) {
 
 function Shirt() {
   const snap = useSnapshot(state)
-  const decalRef = useRef()
+
   const decalTexture = useTexture(snap.logoDecal)
   const { nodes, materials } = useGLTF('/shirt_baked.glb')
   const [decalPosition, setDecalPosition] = useState(snap.logoPosition)
   const [decalScale, setDecalScale] = useState(snap.logoScale)
-  const [warning, setWarning] = useState(false)
 
   useFrame((state, delta) => easing.dampC(materials.lambert1.color, snap.color, 0.25, delta))
 
@@ -117,7 +121,7 @@ function Shirt() {
   const maxDecalWidth = shirtWidth - padding
   const maxDecalHeight = shirtHeight - padding
 
-  const aspectRatio = decalTexture.image.width / decalTexture.image.height
+  const aspectRatio = decalTexture?.image.width / decalTexture?.image.height
 
   const handleDecalMove = (direction) => {
     const moveAmount = 0.01
@@ -172,8 +176,6 @@ function Shirt() {
     console.log(shirtWidth, shirtHeight, aspectRatio)
   }
 
-  const stateString = JSON.stringify(snap)
-
   const [shirtPosition, setShirtPosition] = useState(null)
   useLayoutEffect(() => {
     if (nodes.T_Shirt_male) {
@@ -182,6 +184,8 @@ function Shirt() {
       setShirtPosition(position)
     }
   }, [nodes.T_Shirt_male])
+
+  const stateString = JSON.stringify(snap)
 
   return (
     <group key={stateString}>
@@ -192,17 +196,7 @@ function Shirt() {
       )}
       <mesh castShadow geometry={nodes.T_Shirt_male.geometry} material={materials.lambert1} material-roughness={1} dispose={null}>
         {snap.isLogoTexture && (
-          <Decal
-            debug
-            ref={decalRef}
-            position={decalPosition}
-            scale={decalScale}
-            rotation={[0, 0, 0]}
-            opacity={1}
-            map={decalTexture}
-            depthTest={false}
-            depthWrite={false}
-          />
+          <Decal debug position={decalPosition} scale={decalScale} rotation={[0, 0, 0]} opacity={1} map={decalTexture} depthTest={false} depthWrite={false} />
         )}
       </mesh>
     </group>

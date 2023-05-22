@@ -32,3 +32,26 @@ export const getContrastingColor = (color) => {
   // Return black or white depending on the brightness
   return brightness > 128 ? 'black' : 'white'
 }
+
+export async function createProduct() {
+  try {
+    const response = await fetch('/create-product', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        logoDecal: state.logoDecal, // Assuming this is base64 or a URL
+        size: state.size,
+        color: state.color,
+        decalPosition: state.decalPosition,
+        decalSize: state.decalSize
+      })
+    })
+
+    const result = await response.json()
+    console.log(result)
+  } catch (error) {
+    console.error('Error:', error)
+  }
+}

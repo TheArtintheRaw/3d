@@ -8,7 +8,7 @@ import { LogoControls } from './canvas/LogoControls'
 import ImageBorder from './canvas/ImageBorder'
 import * as THREE from 'three'
 
-export const App = () => {
+export const CanvasModel = () => {
   return (
     <Canvas
       shadows

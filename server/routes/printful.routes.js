@@ -1,118 +1,45 @@
-const express = require('express')
-const axios = require('axios')
-const productCatalog = require('./catalogData.js')
+import express from 'express';
+import axios from 'axios';
 
-const router = express.Router()
+const router = express.Router();
+const printfulApiBaseUrl = 'https://api.printful.com';
+const printfulApiKey = process.env.PRINT_API_KEY;  // Store your API key securely
 
-// Printful API configuration
-const printfulApiBaseUrl = 'https://api.printful.com'
-const printfulApiKey = process.env.PRINTFUL_API_KEY
+// Axios instance for requests to the Printful API
+const printfulApi = axios.create({
+  baseURL: printfulApiBaseUrl,
+  headers: {
+    'Authorization': `Bearer+${printfulApiKey}`,
+    'Content-Type': 'application/json',
+  },
+});
 
-const productData =  productCatalog
-
-// Route to create a product
-router.post('/create-product', async (req, res) => {
+router.post('/store/products', async (req, res) => {
   try {
-    const { productName, variantSize } = req.body
+    // Get the list of all products
+    const { data: productList } = await printfulApi.get('/products');
 
-    // Find the product details in the catalog data
-    const product = productData[productName]
+    // Find the specific product
+    const product = productList.result.find(p => p.name === 'Unisex Organic Cotton T-Shirt | Stanley/Stella STTU755');
     if (!product) {
-      throw new Error('Product not found')
+      return res.status(404).send('Product not found');
     }
 
-    // Find the variant ID for the selected size
-    const variant = product.variants[variantSize]
-    if (!variant) {
-      throw new Error('Variant not found')
-    }
+    // Get the product details
+    const { data: productDetails } = await printfulApi.get(`/products/${product.id}`);
 
-    // Create product payload using the retrieved details
-    const productPayload = {
-      // Populate the payload as needed for product creation
-      product_id: product.product_id,
-      variant_id: variant.variant_id
-      // Add any other required fields
-    }
+    // Extract the variant IDs
+    const variantIds = productDetails.result.variants.map(v => v.id);
 
-    // Make a POST request to Printful API to create the product
-    const response = await axios.post(`${printfulApiBaseUrl}/store/products`, productPayload, {
-      headers: {
-        Authorization: `Bearer ${printfulApiKey}`
-      }
-    })
-
-    // Handle the response from the Printful API
-    if (response.data.result) {
-      res.status(201).json(response.data.result)
-    } else {
-      throw new Error('Failed to create product')
-    }
+    // Respond with the product and variant IDs
+    res.json({
+      productId: 456,
+      variantIds: variantIds,
+    });
   } catch (error) {
-    console.error('Error creating product:', error)
-    res.status(500).json({ error: 'Failed to create product' })
+    console.error('Failed to fetch product details:', error);
+    res.status(500).send('Failed to fetch product details');
   }
-})
+});
 
-// Route to create an order
-router.post('/create-order', async (req, res) => {
-  try {
-    const { recipient, items } = req.body
-
-    // Create an array to store the order items
-    const orderItems = []
-
-    // Iterate through each item in the request
-    for (const item of items) {
-      const { productName, variantSize, quantity } = item
-
-      // Find the product details in the catalog data
-      const product = productCatalog[productName]
-      if (!product) {
-        throw new Error(`Product '${productName}' not found`)
-      }
-
-      // Find the variant ID for the selected size
-      const variant = product.variants[variantSize]
-      if (!variant) {
-        throw new Error(`Variant for size '${variantSize}' not found`)
-      }
-
-      // Create an order item object
-      const orderItem = {
-        product_id: product.product_id,
-        variant_id: variant.variant_id,
-        quantity
-      }
-
-      // Add the item to the order items array
-      orderItems.push(orderItem)
-    }
-
-    // Create order payload using the retrieved details
-    const orderPayload = {
-      recipient,
-      items: orderItems
-      // Add any other required fields
-    }
-
-    // Make a POST request to Printful API to create the order
-    const response = await axios.post(`${printfulApiBaseUrl}/orders`, orderPayload, {
-      headers: {
-        Authorization: `Bearer ${printfulApiKey}`
-      }
-    })
-
-    // Handle the response from the Printful API
-    if (response.data.result) {
-      res.status(201).json(response.data.result)
-    } else {
-      throw new Error('Failed to create order')
-    }
-  } catch (error) {
-    console.error('Error creating order:', error)
-    res.status(500).json({ error: 'Failed to create order' })
-  }
-})
-
-module.exports = router
+export default router;

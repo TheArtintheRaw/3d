@@ -2,18 +2,17 @@ import React from 'react'
 import Overlay from './Overlay'
 import Customizer from './Customizer'
 import { CanvasModel } from './Canvas'
-import ErrorBoundary from './components/ErrorBoundary'
+import Checkout from './Checkout'
 
-function App() {
+export default function App() {
   return (
     <div className="app transition-all ease-in">
-      <ErrorBoundary>
-        <Overlay />
-        <Customizer />
-        <CanvasModel />
-      </ErrorBoundary>
+      <Overlay />
+      <Customizer />
+      <CanvasModel />
+      <Checkout />
     </div>
   )
 }
 
-export default App
+

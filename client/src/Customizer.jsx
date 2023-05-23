@@ -184,10 +184,9 @@ const Customizer = () => {
   const decalTop = (1 - (snap.logoPosition[1] + 1) / 2) * printfulAreaHeight // assuming logoPosition.y is between -1 and 1, and y increases upwards in Printful
 
   const handleBuy = () => {
-    createProduct(variantId, imgUrl, decalLeft, decalTop, decalWidth, decalHeight)
-    if (data.code === 200) {
+    createProduct(variantId, imgUrl, decalLeft, decalTop, decalWidth, decalHeight).then((productId) =>
       createOrder({ recipient: recipient, id: productId, variant_id: variantId }).catch((error) => console.error(error))
-    }
+    )
   }
 
   return (

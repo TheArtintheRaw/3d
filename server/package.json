@@ -26,7 +26,6 @@
     "nodemon": "^2.0.22",
     "openai": "^3.2.1",
     "printful-request": "^2.0.0",
-    "stripe": "^12.6.0",
-
+    "stripe": "^12.6.0"
   }
 }

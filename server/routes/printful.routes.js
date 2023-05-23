@@ -1,7 +1,7 @@
 import express from 'express'
 import axios from 'axios'
 import * as dotenv from 'dotenv'
-import { productCatalog } from './catalogData'
+import { productCatalog } from '../utils/catalogData'
 
 dotenv.config()
 

@@ -27,6 +27,6 @@
     "openai": "^3.2.1",
     "printful-request": "^2.0.0",
     "stripe": "^12.6.0",
-    "valtio": "^1.10.5"
+
   }
 }

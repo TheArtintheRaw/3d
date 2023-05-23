@@ -10,7 +10,7 @@ import { EditorTabs, FilterTabs, DecalTypes } from './config/constants'
 import { fadeAnimation, slideAnimation } from './config/motion'
 import { AIPicker, ColorPicker, CustomButton, FilePicker, SizePicker, Tab, DisplayStats, BuyButton } from './components'
 import { productCatalog } from './components/catalogData'
-import axios from 'axios'
+
 
 const Customizer = () => {
   const snap = useSnapshot(state)
@@ -24,8 +24,6 @@ const Customizer = () => {
   const [activeFilterTab, setActiveFilterTab] = useState({
     logoShirt: true
   })
-
-  const printfulApiKey = process.env.PRINTFUL_API_KEY
 
   // show tab content depending on the activeTab
   const generateTabContent = () => {
@@ -128,7 +126,7 @@ const Customizer = () => {
   }
 
   async function createProduct(variantId, imgUrl, decalLeft, decalTop, decalWidth, decalHeight) {
-    const response = await fetch('/store/products', {
+    const response = await fetch('https://imager-zhu6.onrender.com/api/v1/store/products', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -155,7 +153,7 @@ const Customizer = () => {
   const colorName = snap.colors.find((color) => Object.keys(color)[0] === snap.color)[snap.color]
 
   async function createOrder(recipient, variantId, id) {
-    const response = await fetch('/createOrder', {
+    const response = await fetch('https://imager-zhu6.onrender.com/api/v1/store/orders', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

@@ -18,7 +18,7 @@ const printfulApi = axios.create({
 })
 
 // Endpoint to create a product
-router.post(`/createProduct`, async (req, res) => {
+router.route(`/createProduct`).post(async (req, res) => {
   // Extract data from request body
   const { variantId, imgUrl, decalWidth, decalHeight, decalTop, decalLeft } = req.body
 

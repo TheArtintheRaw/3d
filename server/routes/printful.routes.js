@@ -79,7 +79,7 @@ router.post(`/createOrder`, async (req, res) => {
   }
 
   try {
-    const response = await printfulApi.post(`/store/products`, payload)
+    const response = await printfulApi.post(`/store/orders`, payload)
     const productID = response.data.result.sync_product.id
     res.json({ id: productID, ...response.data }) // Include the product ID in the response
   } catch (error) {

@@ -126,7 +126,7 @@ const Customizer = () => {
   }
 
   async function createProduct(variantId, imgUrl, decalLeft, decalTop, decalWidth, decalHeight) {
-    const response = await fetch('https://imager-zhu6.onrender.com/api/v1/store/products', {
+    const response = await fetch('/createProduct', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -153,7 +153,7 @@ const Customizer = () => {
   const colorName = snap.colors.find((color) => Object.keys(color)[0] === snap.color)[snap.color]
 
   async function createOrder(recipient, variantId, id) {
-    const response = await fetch('https://imager-zhu6.onrender.com/api/v1/store/orders', {
+    const response = await fetch('/createOrder', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

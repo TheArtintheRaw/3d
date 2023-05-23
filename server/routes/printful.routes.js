@@ -1,45 +1,90 @@
-import express from 'express';
-import axios from 'axios';
+import express from 'express'
+import axios from 'axios'
+import * as dotenv from 'dotenv'
+import { productCatalog } from './catalogData'
 
-const router = express.Router();
-const printfulApiBaseUrl = 'https://api.printful.com';
-const printfulApiKey = process.env.PRINT_API_KEY;  // Store your API key securely
+dotenv.config()
 
-// Axios instance for requests to the Printful API
+const router = express.Router()
+const printfulApiBaseUrl = 'https://api.printful.com'
+const printfulApiKey = process.env.PRINTFUL_API_KEY
+
 const printfulApi = axios.create({
   baseURL: printfulApiBaseUrl,
   headers: {
-    'Authorization': `Bearer+${printfulApiKey}`,
-    'Content-Type': 'application/json',
-  },
-});
+    Authorization: `Basic ${printfulApiKey}`,
+    'Content-Type': 'application/json'
+  }
+})
 
-router.post('/store/products', async (req, res) => {
+// Endpoint to create a product
+router.post(`/createProduct`, async (req, res) => {
+  // Extract data from request body
+  const { variantId, imgUrl, decalWidth, decalHeight, decalTop, decalLeft } = req.body
+
+  // Construct the payload for Printful API
+  const payload = {
+    sync_product: {
+      name: 'Custom T-Shirt'
+    },
+    sync_variants: [
+      {
+        variant_id: variantId,
+        files: [
+          {
+            type: 'front',
+            url: imgUrl,
+            position: {
+              area_width: 1200,
+              area_height: 1600,
+              width: decalWidth,
+              height: decalHeight,
+              top: decalTop,
+              left: decalLeft
+            }
+          }
+        ]
+      }
+    ]
+  }
+
   try {
-    // Get the list of all products
-    const { data: productList } = await printfulApi.get('/products');
-
-    // Find the specific product
-    const product = productList.result.find(p => p.name === 'Unisex Organic Cotton T-Shirt | Stanley/Stella STTU755');
-    if (!product) {
-      return res.status(404).send('Product not found');
-    }
-
-    // Get the product details
-    const { data: productDetails } = await printfulApi.get(`/products/${product.id}`);
-
-    // Extract the variant IDs
-    const variantIds = productDetails.result.variants.map(v => v.id);
-
-    // Respond with the product and variant IDs
-    res.json({
-      productId: 456,
-      variantIds: variantIds,
-    });
+    const response = await printfulApi.post(`/store/products`, payload);
+    const productId = response.data.result.sync_product.id;
+    res.json({ id: productId, ...response.data }); // Include the product ID in the response
   } catch (error) {
-    console.error('Failed to fetch product details:', error);
-    res.status(500).send('Failed to fetch product details');
+    res.status(500).json({ error: error.toString() });
   }
 });
 
-export default router;
+router.post(`/createOrder`, async (req, res) => {
+  const { recipient, productId, variantId } = req.body
+
+  const payload = {
+    recipient: recipient,
+    items: [
+      {
+        retail_price: 30.00,
+        id: productId,
+        variant_id: variantId,
+        quantity: 1,
+        files: [
+          {
+            type: 'front',
+            url: imgUrl
+          }
+        ]
+      }
+    ]
+  }
+
+  try {
+    const response = await printfulApi.post(`/store/products`, payload)
+    const productID = response.data.result.sync_product.id
+    res.json({ id: productID, ...response.data }) // Include the product ID in the response
+  } catch (error) {
+    res.status(500).json({ error: error.toString() })
+  }
+})
+
+export default router

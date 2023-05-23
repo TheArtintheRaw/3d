@@ -25,6 +25,8 @@ const Customizer = () => {
     logoShirt: true
   })
 
+  const printfulApiKey = process.env.PRINTFUL_API_KEY
+
   // show tab content depending on the activeTab
   const generateTabContent = () => {
     if (!isOpen) return null
@@ -69,7 +71,7 @@ const Customizer = () => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          prompt
+          payload
         })
       })
 
@@ -125,65 +127,68 @@ const Customizer = () => {
     })
   }
 
-  const printfulApiKey = process.env.PRINTFUL_API_KEY
-
-  async function handleBuy() {
-    // Find the color name that corresponds to the selected color
-    const colorName = snap.colors.find((color) => Object.keys(color)[0] === snap.color)[snap.color]
-
-    // Get variant_id using the color name and size
-    const variantId = productCatalog['Custom T-Shirt'].variants[colorName][snap.size].variant_id
-
-    const printfulAreaWidth = 1200
-    const printfulAreaHeight = 1600
-
-    const decalWidth = snap.logoScale[0] * printfulAreaWidth
-    const decalHeight = snap.logoScale[1] * printfulAreaHeight
-
-    const decalLeft = ((snap.logoPosition[0] + 1) / 2) * printfulAreaWidth // assuming logoPosition.x is between -1 and 1
-    const decalTop = (1 - (snap.logoPosition[1] + 1) / 2) * printfulAreaHeight // assuming logoPosition.y is between -1 and 1, and y increases upwards in Printful
-
-    // Construct the payload for Printful API
-    const payload = {
-      sync_product: {
-        name: 'Custom T-Shirt'
-      },
-      sync_variants: [
-        {
-          variant_id: variantId, // the variant_id you get from productCatalog and state
-          files: [
-            {
-              type: 'front', // assuming the decal is on the front
-              url: `https://3d-vert.vercel.app/${snap.logoDecal}`, // URL of the decal
-              position: {
-                area_width: printfulAreaWidth,
-                area_height: printfulAreaHeight,
-                width: decalWidth,
-                height: decalHeight,
-                top: decalTop,
-                left: decalLeft
-              }
-            }
-          ]
-        }
-      ]
-    }
-    const config = {
-      method: 'post',
-      url: 'https://api.printful.com/store/products',
+  async function createProduct(variantId, imgUrl, decalLeft, decalTop, decalWidth, decalHeight) {
+    const response = await fetch('/store/products', {
+      method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer+${printfulApiKey}`
+        'Content-Type': 'application/json'
       },
-      data: payload
-    }
+      body: JSON.stringify({
+        variantId,
+        imgUrl,
+        decalWidth,
+        decalHeight,
+        decalLeft,
+        decalTop
+      })
+    })
 
-    try {
-      const response = await axios(config)
-      console.log(JSON.stringify(response.data))
-      return response.data
-    } catch (error) {
-      console.error(error)
+    if (response.ok) {
+      const data = await response.json()
+      return data.id // Return the product ID
+    } else {
+      throw new Error('Failed to create product')
+    }
+  }
+
+  // Find the color name that corresponds to the selected color
+  const colorName = snap.colors.find((color) => Object.keys(color)[0] === snap.color)[snap.color]
+
+  async function createOrder(recipient, variantId, id) {
+    const response = await fetch('/createOrder', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ recipient, variantId, id })
+    })
+
+    if (response.ok) {
+      const data = await response.json()
+      return data
+    } else {
+      throw new Error('Failed to create order')
+    }
+  }
+
+  // Get variant_id using the color name and size
+  const variantId = productCatalog['Custom T-Shirt'].variants[colorName][snap.size].variant_id
+
+  const imgUrl = snap.logoDecal
+
+  const printfulAreaWidth = 1200
+  const printfulAreaHeight = 1600
+
+  const decalWidth = snap.logoScale[0] * printfulAreaWidth
+  const decalHeight = snap.logoScale[1] * printfulAreaHeight
+
+  const decalLeft = ((snap.logoPosition[0] + 1) / 2) * printfulAreaWidth // assuming logoPosition.x is between -1 and 1
+  const decalTop = (1 - (snap.logoPosition[1] + 1) / 2) * printfulAreaHeight // assuming logoPosition.y is between -1 and 1, and y increases upwards in Printful
+
+  const handleBuy = () => {
+    createProduct(variantId, imgUrl, decalLeft, decalTop, decalWidth, decalHeight)
+    if (data.code === 200) {
+      createOrder({ recipient: recipient, id: productId, variant_id: variantId }).catch((error) => console.error(error))
     }
   }
 
@@ -208,7 +213,7 @@ const Customizer = () => {
           </motion.div>
 
           <motion.div className="absolute z-10 bottom-16 right-5" {...fadeAnimation}>
-            <BuyButton type="filled" title="Buy" handleClick={handleBuy} customStyles="w-fit px-4 py-2.5 font-bold text-sm" />
+            <BuyButton type="filled" title="Buy" handleClick={handleBuy(createProduct, createOrder)} customStyles="w-fit px-4 py-2.5 font-bold text-sm" />
           </motion.div>
 
           <motion.div className="filtertabs-container" {...slideAnimation('up')}>

@@ -3,6 +3,7 @@ import cors from 'cors'
 import * as dotenv from 'dotenv'
 
 import dalleRoutes from './routes/dalle.routes.js'
+import printfulRoutes from './routes/printful.routes.js'
 
 dotenv.config()
 
@@ -39,6 +40,7 @@ app.post('/create-payment-intent', async (req, res) => {
 })
 
 app.use('/api/v1/dalle', dalleRoutes)
+app.use('/api/v1/printful', printfulRoutes) // Corrected here
 
 app.get('/', (req, res) => {
   res.status(200).json({ message: 'Hello from DALL.E' })

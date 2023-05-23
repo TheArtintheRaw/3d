@@ -150,7 +150,7 @@ const Customizer = () => {
   }
 
   // Find the color name that corresponds to the selected color
-  const colorName = snap.colors.find((color) => Object.keys(color)[0] === snap.color)[snap.color]
+
 
   async function createOrder(recipient, variantId, id) {
     const response = await fetch('/createorder', {
@@ -169,6 +169,7 @@ const Customizer = () => {
     }
   }
 
+  const colorName = snap.colors.find((color) => Object.keys(color)[0] === snap.color)[snap.color]
   // Get variant_id using the color name and size
   const variantId = productCatalog['Custom T-Shirt'].variants[colorName][snap.size].variant_id
 
@@ -183,11 +184,15 @@ const Customizer = () => {
   const decalLeft = ((snap.logoPosition[0] + 1) / 2) * printfulAreaWidth // assuming logoPosition.x is between -1 and 1
   const decalTop = (1 - (snap.logoPosition[1] + 1) / 2) * printfulAreaHeight // assuming logoPosition.y is between -1 and 1, and y increases upwards in Printful
 
-  const handleBuy = () => {
-    createProduct(variantId, imgUrl, decalLeft, decalTop, decalWidth, decalHeight).then((productId) =>
-      createOrder({ recipient: recipient, id: productId, variant_id: variantId }).catch((error) => console.error(error))
-    )
+  const handleBuy = async () => {
+    try {
+      const productId = await createProduct(variantId, imgUrl, decalWidth, decalHeight, decalTop, decalLeft)
+      console.log(productId)
+    } catch (error) {
+      console.error(error) // This will catch and print the error
+    }
   }
+
 
   return (
     <AnimatePresence>

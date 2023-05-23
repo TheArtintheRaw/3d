@@ -4,6 +4,7 @@ import * as dotenv from 'dotenv'
 
 import dalleRoutes from './routes/dalle.routes.js'
 import printfulRoutes from './routes/printful.routes.js'
+import stripeRoutes from './routes/stripe.routes.js'
 
 dotenv.config()
 
@@ -25,14 +26,38 @@ const calculateOrderAmount = (items) => {
 }
 
 app.post('/create-payment-intent', async (req, res) => {
-  const { items } = req.body
+  const { items, shipping } = req.body
 
-  // Create a PaymentIntent with the order amount and currency
+  // Validate shipping information
+  if (
+    !shipping ||
+    !shipping.name ||
+    !shipping.address ||
+    !shipping.address.line1 ||
+    !shipping.address.city ||
+    !shipping.address.state ||
+    !shipping.address.postal_code ||
+    !shipping.address.country
+  ) {
+    return res.status(400).json({ error: 'Invalid shipping information' })
+  }
+
+  // Create a PaymentIntent with the order amount, currency, and shipping information
   const paymentIntent = await stripe.paymentIntents.create({
     amount: calculateOrderAmount(items),
     currency: 'cad',
     automatic_payment_methods: {
       enabled: true
+    },
+    shipping: {
+      name: shipping.name,
+      address: {
+        line1: shipping.address.line1,
+        city: shipping.address.city,
+        state: shipping.address.state,
+        postal_code: shipping.address.postal_code,
+        country: shipping.address.country
+      }
     }
   })
 
@@ -42,7 +67,8 @@ app.post('/create-payment-intent', async (req, res) => {
 })
 
 app.use('/api/v1/dalle', dalleRoutes)
-app.use('/api/v1/printful', printfulRoutes) // Corrected here
+app.use('/api/v1/printful', printfulRoutes)
+app.use('/api/v1/stripe', stripeRoutes)
 
 app.get('/', (req, res) => {
   res.status(200).json({ message: 'Hello from DALL.E' })

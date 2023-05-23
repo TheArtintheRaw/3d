@@ -126,7 +126,7 @@ const Customizer = () => {
   }
 
   async function createProduct(variantId, imgUrl, decalLeft, decalTop, decalWidth, decalHeight) {
-    const response = await fetch('/createProduct', {
+    const response = await fetch('/createproduct', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -153,7 +153,7 @@ const Customizer = () => {
   const colorName = snap.colors.find((color) => Object.keys(color)[0] === snap.color)[snap.color]
 
   async function createOrder(recipient, variantId, id) {
-    const response = await fetch('/createOrder', {
+    const response = await fetch('/createorder', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

@@ -3,7 +3,7 @@ export const productCatalog = {
     product_id: 456,
     variants: {
       Anthracite: {
-        S: { variant_id: 12424, size: S, color_code: '#3e383e', },
+        S: { variant_id: 12424 },
         M: { variant_id: 12425 },
         L: { variant_id: 12426 },
         XL: { variant_id: 12427 },

@@ -7,7 +7,7 @@ dotenv.config()
 
 const router = express.Router()
 const printfulApiBaseUrl = 'https://api.printful.com'
-const printfulApiKey = process.env.PRINTFUL_API_KEY
+const printfulApiKey = process.env.PRINTFUL_API_TOKEN
 
 const printfulApi = axios.create({
   baseURL: printfulApiBaseUrl,

@@ -8,7 +8,9 @@ import printfulRoutes from './routes/printful.routes.js'
 dotenv.config()
 
 // Stripe library
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
+import stripe from 'stripe'
+
+stripe=(process.env.STRIPE_SECRET_KEY)
 
 const app = express()
 app.use(cors())
